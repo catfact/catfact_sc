@@ -83,7 +83,8 @@ Remains  {
 			env = Env.linen(attack, dur, release, 1, 'lin');
 			amp = EnvGen.ar(env, gate, 1, doneAction:2);
 			saw_amp = EnvGen.ar(env, gate, timeScale:2.0);
-			freq_comp = AmpCompA.kr(freq);
+			//freq_comp = AmpCompA.kr(freq);
+			freq_comp = freq;
 			saw = Pan2.ar(SyncSaw.ar(freq_comp, freq * (2 ** (3 * timbre2))), panfactor2);
 			sin = Mix.new([Pan2.ar(VOsc.ar((timbre1 * numbufs) + basebuf, freq_comp), panfactor1), Pan2.ar(FSinOsc.ar(freq * 0.5) * sub_level, -1 * panfactor1)]);
 			ring = Pan2.ar(Mix.ar([sin * saw]), panfactor2 * -1);
@@ -423,7 +424,7 @@ Remains  {
 		
 		
 		out_limiter_patch_1.set(\pan, -1);
-		newosc.value(140, 0.4, 10.0);
+		//newosc.value(140, 0.4, 10.0);
 		
 		/////////////////////////////////////////////////////----------------------------------- gui
 		
@@ -436,42 +437,61 @@ Remains  {
 		remains_logic_win = SCWindow("LISTENER", Rect(0, 400, 320, 370));
 		remains_logic_win.front;
 		
-		pollperiod_label = SCStaticText(remains_logic_win, Rect(100, 10, 140, 25));
+		pollperiod_label = SCStaticText(remains_logic_win, Rect(0, 0, 220, 74));
 		pollperiod_label.string = "POLLING PERIOD s";
+		pollperiod_label.background = Color.new(0.7, 0.7, 0.7);
+		pollperiod_label.align = \center;
+		pollperiod_label.font = Font("Times", 24);
 		
-		pollperiod_numbox = SCNumberBox(remains_logic_win, Rect(100, 45, 120, 25));
-		pollperiod_numbox.background = Color.new(0.9, 0.9, 0.9);
+		pollperiod_numbox = RoundNumberBox(remains_logic_win, Rect(220, 0, 100, 74));
+		pollperiod_numbox.background = Color.new(0.8, 0.8, 0.8);
 		pollperiod_numbox.clipLo_(0.02);
 		pollperiod_numbox.clipHi_(2.0);		
 		pollperiod_numbox.scroll_step_(0.02);
 		pollperiod_numbox.value_(delta_t);
+		pollperiod_numbox.font = Font("Times", 24);
+		pollperiod_numbox.align = \center;
+		pollperiod_numbox.radius = 0.0;
 		
-		timethreshold_label = SCStaticText(remains_logic_win, Rect(100, 90, 140, 25));
+		timethreshold_label = SCStaticText(remains_logic_win, Rect(0, 74, 220, 74));
 		timethreshold_label.string = "TIME THRESHOLD s";
+		timethreshold_label.align = \center;
+		timethreshold_label.font = Font("Times", 22);
 		
-		timethreshold_numbox = SCNumberBox(remains_logic_win, Rect(100, 135, 120, 25));
+		timethreshold_numbox = RoundNumberBox(remains_logic_win, Rect(220, 74, 100, 74));
 		timethreshold_numbox.background = Color.new(0.9, 0.9, 0.9);
 		timethreshold_numbox.clipLo_(0.2);
 		timethreshold_numbox.clipHi_(20.0);
 		timethreshold_numbox.scroll_step_(0.05);
 		timethreshold_numbox.value_(amp_t_thresh);
+		timethreshold_numbox.font = Font("Times", 24);
+		timethreshold_numbox.align = \center;
+		timethreshold_numbox.radius = 0.0;
 			
-		ampthreshold_label = SCStaticText(remains_logic_win, Rect(100, 180, 140, 25));
+		ampthreshold_label = SCStaticText(remains_logic_win, Rect(0, 148, 220, 74));
 		ampthreshold_label.string = "AMP THRESHOLD dB";
+		ampthreshold_label.align = \center;
+		ampthreshold_label.font = Font("Times", 22);
+		ampthreshold_label.background = Color.new(0.7, 0.7, 0.7);
 		
-		ampthreshold_numbox = SCNumberBox(remains_logic_win, Rect(100, 225, 120, 25));
-		ampthreshold_numbox.background = Color.new(0.9, 0.9, 0.9);
+		ampthreshold_numbox = RoundNumberBox(remains_logic_win, Rect(220, 148, 100, 74));
+		ampthreshold_numbox.background = Color.new(0.8, 0.8, 0.8);
 		ampthreshold_numbox.clipLo_(-60);
 		ampthreshold_numbox.clipHi_(0);
 		ampthreshold_numbox.scroll_step_(0.5);
 		ampthreshold_numbox.value_(amp_thresh.ampdb);
+		ampthreshold_numbox.font = Font("Times", 24);
+		ampthreshold_numbox.align = \center;
+		ampthreshold_numbox.radius = 0.0;
 		
-		signal_label = SCStaticText(remains_logic_win, Rect(100, 270, 95, 25));
+		signal_label = SCStaticText(remains_logic_win, Rect(0, 222, 220, 74));
 		signal_label.string = "SIGNAL";
-		signal_led = SCTextField(remains_logic_win, Rect(195, 270, 25, 25));
+		signal_label.align = \center;
+		signal_label.font = Font("Times", 24);
+		signal_led = SCTextField(remains_logic_win, Rect(220, 222, 100, 74));
 		signal_led.background_(Color.black;);
 		
-		storedefaults_button = SCButton(remains_logic_win, Rect(120, 330, 80, 25))
+		storedefaults_button = SCButton(remains_logic_win, Rect(0, 296, 320, 74))
 			.states_([["store defaults", Color.black, Color.new(0.5, 0.9, 0.5)]])
 			.action_({
 				defaults_file = File(String.scDir.dirname ++ "/remains_defaults.bin", "wb");
@@ -483,7 +503,8 @@ Remains  {
 				defaults_file.putFloat(lim_postgain_db);
 				defaults_file.close;
 			});
-		
+		storedefaults_button.font = Font("Times", 24);
+				
 		pollperiod_numbox.action = { |numb|
 			delta_t = numb.value;
 		};
@@ -501,27 +522,40 @@ Remains  {
 		
 		pregain_label = SCStaticText(remains_ctl_win, Rect(5, 5, 100, 25));
 		pregain_label.string = "PREGAIN dB";
-		//pregain_label.background = Color.white;
+		pregain_label.align = \center;
 		thresh_label = SCStaticText(remains_ctl_win, Rect(110, 5, 100, 25));
 		thresh_label.string = "THRESHOLD dB";
-		//thresh_label.background = Color.white;
 		postgain_label = SCStaticText(remains_ctl_win, Rect(215, 5, 100, 25));
 		postgain_label.string = "POSTGAIN dB";
-		//postgain_label.background = Color.white;
 		
-		pregain_numbox = SCNumberBox(remains_ctl_win, Rect(5, 35, 100, 25));
+		pregain_numbox = RoundNumberBox(remains_ctl_win, Rect(5, 35, 100, 25));
 		pregain_numbox.background = Color.new(0.9, 0.9, 0.9);
-		thresh_numbox = SCNumberBox(remains_ctl_win, Rect(110, 35, 100, 25));
+		pregain_numbox.font = Font("Times", 24);
+		pregain_numbox.align = \center;
+		pregain_numbox.radius = 0.0;
+		thresh_numbox = RoundNumberBox(remains_ctl_win, Rect(110, 35, 100, 25));
 		thresh_numbox.background = Color.new(0.9, 0.9, 0.9);
-		postgain_numbox = SCNumberBox(remains_ctl_win, Rect(215, 35, 100, 25));
+		thresh_numbox.font = Font("Times", 24);
+		thresh_numbox.align = \center;
+		thresh_numbox.radius = 0.0;
+		postgain_numbox = RoundNumberBox(remains_ctl_win, Rect(215, 35, 100, 25));
 		postgain_numbox.background = Color.new(0.9, 0.9, 0.9);
+		postgain_numbox.font = Font("Times", 24);
+		postgain_numbox.align = \center;
+		postgain_numbox.radius = 0.0;
 		
-		pregain_slider = SCSlider(remains_ctl_win, Rect(5, 65, 100, 300));
+		pregain_slider = SmoothSlider(remains_ctl_win, Rect(5, 65, 100, 300));
 		pregain_slider.knobColor = Color.black;
-		thresh_slider = SCSlider(remains_ctl_win, Rect(110, 65, 100, 300));
+		pregain_slider.hiliteColor = Color.black;
+		pregain_slider.knobSize = 0;
+		thresh_slider = SmoothSlider(remains_ctl_win, Rect(110, 65, 100, 300));
 		thresh_slider.knobColor = Color.black;
-		postgain_slider = SCSlider(remains_ctl_win, Rect(215, 65, 100, 300));
+		thresh_slider.hiliteColor = Color.black;
+		thresh_slider.knobSize = 0;
+		postgain_slider = SmoothSlider(remains_ctl_win, Rect(215, 65, 100, 300));
 		postgain_slider.knobColor = Color.black;
+		postgain_slider.hiliteColor = Color.black;
+		postgain_slider.knobSize = 0;
 		
 		gain_spec = [-24.0, 24.0, \lin, 0.25, 0.0].asSpec;
 		thresh_spec = [-32.0, 0.0, \lin, 0.25, -6.0].asSpec;

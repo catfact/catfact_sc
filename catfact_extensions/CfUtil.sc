@@ -13,7 +13,6 @@ CfTapper {
 	tap {
 		var thenow;
 		thenow = SystemClock.seconds;
-//		["tapping", thenow, now].postln;
 		if (now.notNil, {
 			time = thenow - now;
 			now = thenow;
@@ -21,6 +20,7 @@ CfTapper {
 			time = 0.0;
 			now = thenow;
 		});
+		^time
 	}
 	
 	reset {

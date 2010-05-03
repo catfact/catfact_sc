@@ -359,7 +359,7 @@ Remains  {
 										lastnote = time;
 									}, {
 										targetpitch = pitch;
-										lasthighamp = time;
+										//lasthighamp = time;
 									});
 								}, { 
 									//box_set.value(0, 2, 0)

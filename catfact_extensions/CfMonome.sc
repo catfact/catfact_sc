@@ -72,21 +72,18 @@ postln(prefix);
 	}
 	
 	// always use /box/led_row and bitmasking cause it's faster for the 40h hardware (?)
-	set {
+	led {
 		arg x, y, v;
 //		addr.sendMsg(prefix ++ '/led', x, y, v);
 		var val;
 		if (v>0, {val=(rowVals[y]) | (1 << x)},{val=(rowVals[y] & (1 << x).bitNot)});
-		this.setRow(y, val);
+		this.ledRow(y, val);
 	}
 	
-	setRow {	arg y, val;
+	ledRow {	arg y, val;
 		addr.sendMsg(prefix ++ '/led_row', y, val);
 		rowVals[y] = val;
 	}
-	
-	setPressAction { arg func; press = func; }
-	setliftAction { arg func; lift = func; }
 	
 	kill {
 		responder.remove;

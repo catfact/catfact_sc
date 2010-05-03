@@ -1,31 +1,34 @@
 CfCellotrig {
 
-	var <>s;
+	var <>server;
+	
 	var <>onset_func;
-	var <>trigger_func;
+	var <>trig_func;
 	
 	var <>onset_fft_buf;
 	var <>onset_s;
-	var <>trigger_s;
+	var <target_notes;
+	var <>trig_s;
+	var <trig_hz;
 	
-	var <>onset_r;
-	var <>trigger_r;
+	var <>responder;
 	
 	*new {
-		arg server;
-		^super.new.init(server);
+		arg server, target_notes_arg;
+		^super.new.init(server, target_notes_arg);
 	}
 	
 	init {
-		arg server;
-		s = server;
+		arg server_arg, target_notes_arg;
+		server = server_arg;
+		target_notes = target_notes_arg;
 		
 		Routine {
-			s.waitForBoot {			
+			server.waitForBoot {			
 				
 				
 				SynthDef.new(\targetNoteEvents, {
-					arg	in= 0,
+					arg in= 0,
 						out= 0,
 						outswitch=0,
 						hist_len= 0.5,
@@ -48,7 +51,7 @@ CfCellotrig {
 					osc_trig = ((gate * sweep) > hist_thresh);
 					Out.kr(out, outswitch * [in_hz, inpitchrange, gate, sweep, osc_trig] );
 					SendTrig.kr(osc_trig, trig_id);
-				}).store;
+				}).load(server);
 				
 				SynthDef.new(\onsetEvents, {
 					arg in =		0,
@@ -63,44 +66,60 @@ CfCellotrig {
 					chain = FFT(buf, sig);
 					onsets = Onsets.kr(chain, thresh, \rcomplex, relax);
 					SendTrig.kr(onsets, trigid);	
-				}).store;
+				}).load(server);
 				
 				postln("defined synthdefs");
 				
 				0.1.wait;
 				
-				onset_fft_buf = Buffer.alloc(s, 1024, 1);
+				onset_fft_buf = Buffer.alloc(server, 1024, 1);
 				postln("allocated fft buf");
 				
 				
 				0.1.wait;
 				
+				onset_s = Synth.new(\onsetEvents, [\buf, onset_fft_buf, \trigid, 100], server);
 				
-				onset_s = Synth.new(\onsetEvents, [\buf, onset_fft_buf, \trig_id, 0], s);
-				trigger_s = Synth.new(\targetNoteEvents, [
-					\in_hz, 220, 
-					\hz_tolerance, 5.0,
-					\hist_len, 1.0,
-					\trig_id, 1
-				], s);
+				//trig_hz = Array.fill(num_trigs, { arg i; 110 * (2 ** i); });
+				trig_hz = target_notes.midicps;
+				trig_s = trig_hz.collect({
+					arg hz, i;
+					Synth.new(\targetNoteEvents, [
+						\in_hz, hz, 
+						\hz_tolerance, (hz.cpsmidi + 0.5).midicps - hz,
+						\hist_len, 1.0,
+						\trig_id, i
+					], server);
+				});
 				
 				onset_func = {
-					arg t, r, msg;
-					[t, r, msg].postln;
+					arg t;
+					postln("onset at " ++ t ++ " s");
 				};
 				
-				trigger_func = {
-					arg t, r, msg;
-					[t, r, msg].postln;
-				};
+				trig_func = Array.fill(target_notes.size, { 
+					{	
+						arg t, which;
+						postln("trigger " ++ which);
+					};
+				});
 				
-				onset_r = OSCresponderNode(nil, '/tr', {
+				responder = OSCresponderNode(nil, '/tr', { 
 					arg t, r, msg;
 					[t, r, msg].postln;
-					//onset_func
+					/*
+					if (msg[2] == 100, {
+						onset_func.value(t);
+					}, {
+						trig_func.value(t, msg[2]);
+					});
+					*/
+					
 				}).add;
-				trigger_r = OSCresponderNode(nil, '/tr', trigger_func).add;
+				
+				postln("added osc responder");
 								
+				postln("init done");
 				
 			} // waitforboot
 		}.play;	// init routine

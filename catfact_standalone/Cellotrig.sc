@@ -1,4 +1,4 @@
-CfCellotrg {
+CfCellotrig {
 
 	var <>s;
 	var <>onset_func;

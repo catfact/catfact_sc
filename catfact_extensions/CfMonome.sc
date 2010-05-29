@@ -56,13 +56,13 @@ postln(prefix);
 		press = { 
 			arg col, row;
 			"press ".post; [col, row].postln;
-			this.set(col, row, 1);
+			this.led(col, row, 1);
 		};
 		
 		lift = {
 			arg col, row;
 			"lift ".post; [col, row].postln;
-			this.set(col, row, 0);
+			this.led(col, row, 0);
 		};
 	}
 	

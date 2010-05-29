@@ -41,9 +41,11 @@ CfCellotrig {
 						hist_min = 0.001,
 						sweep, gate, osc, 
 						sweep_trig, gate_trig, osc_trig,
-						inpitchrange;
+						inpitchrange,
+						tgt_hz;
 						
-					# in_hz, in_hz_flag = Tartini.kr(SoundIn.ar(in), 0.93,1024,512,512);
+					# in_hz, in_hz_flag = Pitch.kr(SoundIn.ar(in));
+					tgt_hz = target_hz;
 					inpitchrange = ((in_hz - target_hz).abs < hz_tolerance);
 					gate = inpitchrange;
 					sweep_trig = inpitchrange;
@@ -80,12 +82,11 @@ CfCellotrig {
 				
 				onset_s = Synth.new(\onsetEvents, [\buf, onset_fft_buf, \trigid, 100], server);
 				
-				//trig_hz = Array.fill(num_trigs, { arg i; 110 * (2 ** i); });
 				trig_hz = target_notes.midicps;
 				trig_s = trig_hz.collect({
 					arg hz, i;
 					Synth.new(\targetNoteEvents, [
-						\in_hz, hz, 
+						\target_hz, hz, 
 						\hz_tolerance, (hz.cpsmidi + 0.5).midicps - hz,
 						\hist_len, 1.0,
 						\trig_id, i
@@ -106,20 +107,22 @@ CfCellotrig {
 				
 				responder = OSCresponderNode(nil, '/tr', { 
 					arg t, r, msg;
-					[t, r, msg].postln;
-					/*
+					
+					// [t, r, msg].postln;
+					
 					if (msg[2] == 100, {
 						onset_func.value(t);
 					}, {
-						trig_func.value(t, msg[2]);
+						// "note event...".postln;
+						// msg[2].postln;
+						trig_func[msg[2]].value(t, msg[2]);
 					});
-					*/
+					
 					
 				}).add;
 				
-				postln("added osc responder");
-								
-				postln("init done");
+				// postln("added osc responder");
+				// postln("init done");
 				
 			} // waitforboot
 		}.play;	// init routine

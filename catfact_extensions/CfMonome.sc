@@ -5,7 +5,8 @@ CfMonome
 	var <>responder;
 	var <>addr;
 	var <>rowVals;
-	var <>lift, <>press;
+	var <>press, <>lift;
+	var <>liftFunctions, <>pressFunctions;
 	
 	
 	*new {
@@ -39,10 +40,14 @@ postln(prefix);
 				switch (val) 
 				{1}
 				{
+					pressFunctions.do({ arg func; func.value(col, row); });
+					// backwards compatibility
 					press.value(col, row);
 				}
 				{0}
 				{
+					liftFunctions.do({ arg func;  func.value(col, row); });
+					// backwards compatibility
 					lift.value(col, row);
 				}
 			}
@@ -51,7 +56,6 @@ postln(prefix);
 				
 		// make an array of (8bit) row values and clear them
 		rowVals=Array.fill(8,0).do({arg item, i; addr.sendMsg("/box/led_row", i, 0)});
-		
 		
 		press = { 
 			arg col, row;
@@ -64,6 +68,9 @@ postln(prefix);
 			"lift ".post; [col, row].postln;
 			this.led(col, row, 0);
 		};
+		
+		pressFunctions = Dictionary.new.add('default'->press);
+		liftFunctions = Dictionary.new.add('default'->lift);
 	}
 	
 	setPrefix { arg prefixArg;
@@ -85,8 +92,17 @@ postln(prefix);
 		rowVals[y] = val;
 	}
 	
+	emu {
+	//	win = 
+	}
+	
 	kill {
 		responder.remove;
 	}
+	
+	clear {
+		8.do({|row|this.ledRow(row, 0); });
+	}
+
 }
 

@@ -68,11 +68,11 @@ Crawl {
 		rec_s.free;
 		rate = ratearg;
 		rectapper.tap;
-		^(this.play(rectapper.time));
+		^(this.play);
 	}
 	
 	play {
-		arg len;
+		var len = rectapper.time;
 		// we want about 4 overlapping grains, that gives us:
 		dur = len/2;
 		skip = len/8;

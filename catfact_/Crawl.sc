@@ -32,7 +32,7 @@ Crawl {
 				lpfrq0=0.0, lpfrq1=1.0;
 			var env, amp, bufframes, bufdur, bufsamplerate, phase, sig, panL, panR, lpf;
 			env = Env.linen(dur*atk, dur*(1.0-atk-rel), dur*rel);
-			amp = EnvGen.ar(env, doneAction:2);
+			amp = EnvGen.ar(env, gate:1, doneAction:2);
 			bufframes = BufFrames.kr(buf);
 			bufdur = BufDur.kr(buf);
 			bufsamplerate = bufframes/bufdur;
@@ -97,7 +97,7 @@ Crawl {
 			
 			lpfrq0 = i/num * 0.5;
 			lpfrq1 = i/num * 3.3;
-			
+			dur.postln;			
 			Synth.new(\crawlgrain, [
 				\buf, buf,
 				\out, out_b,

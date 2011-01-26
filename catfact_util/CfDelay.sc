@@ -1,3 +1,5 @@
+// a bank of 4 delays with feedback. inot
+
 CfDelay4 {
 	var <>s;
 	var <>del_buf, <>del_in_b, <>del_in_s;

@@ -1,5 +1,5 @@
 
-CfMonome
+Cf40h
 {
 	var <>host, <>port, <>prefix;
 	var <>responder;
@@ -57,16 +57,19 @@ postln(prefix);
 		// make an array of (8bit) row values and clear them
 		rowVals=Array.fill(8,0).do({arg item, i; addr.sendMsg("/box/led_row", i, 0)});
 		
-		press = { 
+		press = { /*
 			arg col, row;
 			"press ".post; [col, row].postln;
 			this.led(col, row, 1);
+			*/
 		};
 		
 		lift = {
+			/*
 			arg col, row;
 			"lift ".post; [col, row].postln;
 			this.led(col, row, 0);
+			*/
 		};
 		
 		pressFunctions = Dictionary.new.add('default'->press);

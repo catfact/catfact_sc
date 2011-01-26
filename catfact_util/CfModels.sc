@@ -78,7 +78,64 @@ CfFpuRing : CfModel2d{
 }
 
 // cellular automaton, binary rules
-CfBinaryRuleAut " CfModel2d{
+CfBinaryAut : CfModel2d{
+	var <>rule;
+	
 }
 
-// 
+// cellular automaton, continuous rules
+CfContinuousAut : CfModel2d{
+	var <>weights_l, <>weights_r; // weighting functions for the left and right, 
+	var <>weight_res; // resolution of the weighting
+	var <>wrap, <>clip;
+	
+	*new { arg n;
+		^super.new(n).cfContinuousAutInit(n);	
+	}
+
+	cfContinuousAutInit {
+		weight_res = 128;
+		weights_l = Array.fill(weight_res, {0.5});
+		weights_r = Array.fill(weight_res, {0.5});
+		wrap = true;
+		clip = false;
+		val.postln;
+	}
+	
+	iter {
+		var xR, xL, iR, iL, yR, yL;
+		val.do({ arg v, i;
+			// use neighbor values in lookup table of weights
+			xR = val[(i+1).wrap(0, n-1)];
+			iR = (xR * (weight_res-1));
+			//("iR: "++iR).postln;
+			/*
+			yR = weights_r[iR.floor] +
+				(weights_r[(iR.floor + 1).wrap(0, weight_res-1)] - weights_r[iR.floor]) *
+				(iR - iR.floor);
+			*/
+			yR = weights_r[iR.floor.wrap(0, weight_res-1)];
+				
+			xL = val[(i-1).wrap(0, n-1)]; 
+			iL = (xL * (weight_res-1));
+			//("iL: "++iL).postln; 
+			/*
+			yL = weights_l[iL.floor] +
+				(weights_l[(iL.floor + 1).wrap(0, weight_res-1)] - weights_l[iL.floor]) *
+				(iL - iL.floor);
+			*/
+			yL = weights_l[iL.floor.wrap(0, weight_res-1)];
+			
+			
+			// DEBUG
+			// [iR, iL].postln;
+			
+			val[i] = v + (yL + yR)*0.5;
+			
+			if (wrap, {val[i] = val[i].wrap(-1.0, 1.0); });
+			if (clip, {val[i] = val[i].clip(-1.0, 1.0); });
+			
+			//val.postln;
+		});
+	}
+}

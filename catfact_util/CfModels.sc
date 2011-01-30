@@ -16,7 +16,7 @@ CfModel2d {
 		val = Array.fill(n, {0.0});
 	}
 	
-	iter {
+	iterate {
 		n.do({
 			// something
 		});
@@ -50,7 +50,7 @@ CfFpuRing : CfModel2d{
 		acc = Array.fill(n, {0.0});
 	}
 	
-	iter {
+	iterate {
 		n.do({
 			arg i;
 			var dist;
@@ -102,7 +102,7 @@ CfContinuousAut : CfModel2d{
 		val.postln;
 	}
 	
-	iter {
+	iterate {
 		var xR, xL, iR, iL, yR, yL;
 		val.do({ arg v, i;
 			// use neighbor values in lookup table of weights

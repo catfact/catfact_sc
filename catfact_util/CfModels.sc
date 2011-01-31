@@ -5,7 +5,7 @@
 
 // abstract interface class
 CfModel2d {
-	var <>n, <>val;
+	var <>n, <>val, <>function;
 	
 	*new { arg n;
 		^super.new.cfModel2dInit(n);
@@ -14,12 +14,16 @@ CfModel2d {
 	cfModel2dInit { arg argN;
 		n = argN;
 		val = Array.fill(n, {0.0});
+		function = {};
 	}
 	
 	iterate {
+		/*
 		n.do({
-			// something
+			// something... define in subclasses
 		});
+		*/
+		function.value(val);
 	}
 }
 
@@ -74,6 +78,7 @@ CfFpuRing : CfModel2d{
 			if (wrap, {val[i] = val[i].wrap(-1.0, 1.0); });
 			if (clip, {val[i] = val[i].clip(-1.0, 1.0); });
 		});
+		super.iterate;
 	}
 }
 
@@ -137,5 +142,6 @@ CfContinuousAut : CfModel2d{
 			
 			//val.postln;
 		});
+		super.iterate;
 	}
 }

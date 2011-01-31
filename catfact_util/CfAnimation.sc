@@ -4,11 +4,11 @@ Document.current.background_(Color.new(0.5, 0.5, 0.5, 1.0));
 
 // an animation compositor
 CfCanvas {
-	var <>window;		// SCWindow
-	var <>uv;			// SCUSerView
-	var <>layers;		// list of CfAnimationLayer
-	var <>routine; 	// Routine
-	var <>dt;			// time between redraws
+	var <>window;			// SCWindow
+	var <>uv;				// SCUSerView
+	var <>layers;			// list of CfAnimationLayer
+	var <>routine; 		// Routine
+	var <>dt;				// time between redraws
 
 	*new { 
 		arg name;
@@ -186,6 +186,7 @@ CfGridTrace2d : CfAnimationLayer {
 	var <>n;
 	var <>history, <>h;
 	var <>blockW, <>blockH;
+	var <>hue;
 	
 	*new { arg bounds, n, h;
 		^super.new.cfGridTrace2dInit(bounds, n, h);
@@ -200,10 +201,11 @@ CfGridTrace2d : CfAnimationLayer {
 		history = Array.fill(h, { Array.fill(model.n, {0.0}); });
 		blockW = bounds.width / n;
 		blockH = bounds.height / h;
+		hue = Color.red;
 	}
 	
 	draw {
-		model.iter;
+		model.iterate;
 		history = history.copyRange(1, h-1);
 		history = history.add(Array.newFrom(model.val));
 		
@@ -216,7 +218,8 @@ CfGridTrace2d : CfAnimationLayer {
 				if (val > 0, {
 					Pen.fillColor = Color.new(val, val, val);
 				}, {
-					Pen.fillColor = Color.new(val * -1, val * -0.5, val * -0.5);
+//					Pen.fillColor = Color.new(val * -1, val * -0.5, val * -0.5);
+					Pen.fillColor = hue.multiply(val.abs).alpha_(1);
 				});
 				Pen.fillRect(Rect(i * blockW - 1,
 					j * blockH - 1,
@@ -263,7 +266,7 @@ CfTriSpiralTrace2d : CfAnimationLayer {
 	
 	draw {
 		var l;
-		model.iter;
+		model.iterate;
 		history = history.copyRange(1, h-1);
 		history = history.add(Array.newFrom(model.val));
 		
@@ -320,7 +323,7 @@ CfWedgeTrace2d : CfAnimationLayer {
 	
 	draw {
 		var l;
-		model.iter;
+		model.iterate;
 		history = history.copyRange(1, h-1);
 		history = history.add(Array.newFrom(model.val));
 		
@@ -371,6 +374,7 @@ CfShardTrace2d : CfAnimationLayer {
 	var <>phi, <>dphi;
 	var <>dr;
 	var <>rScale;
+	var <>hue;
 	
 	*new { arg bounds, n, h;
 		^super.new.cfShardTrace2dInit(bounds, n, h);
@@ -386,11 +390,12 @@ CfShardTrace2d : CfAnimationLayer {
 		dphi = 2pi / h;
 		phi = 0.0;
 		dr = 50;
+		hue = Color.red;
 	}
 	
 	draw {
 		var l;
-		model.iter;
+		model.iterate;
 		history = history.copyRange(1, h-1);
 		history = history.add(Array.newFrom(model.val));
 		
@@ -405,7 +410,7 @@ CfShardTrace2d : CfAnimationLayer {
 				if (val > 0, {
 					Pen.fillColor = Color.new(val, val, val);
 				}, {
-					Pen.fillColor = Color.new(val * -1, val * -0.5, val * -0.5);
+					Pen.fillColor = hue.multiply(val.abs).alpha_(1);
 				});
 				Pen.beginPath;
 				Pen.addAnnularWedge(

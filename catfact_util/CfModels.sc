@@ -85,7 +85,25 @@ CfFpuRing : CfModel2d{
 // cellular automaton, binary rules
 CfBinaryAut : CfModel2d{
 	var <>rule;
+
+	*new { arg n;
+		^super.new(n).cfBinaryAutInit(n);	
+	}
+
+	cfBinaryAutInit {
+		val.postln;
+	}
 	
+	iterate {
+		val.do({ arg v, i;
+			var code = 0; // 8 bit input to rule
+			code = code | (val[(i-1).wrap(0, n-1)] << 2);
+			code = code | (v << 1);
+			code = code | (val[(i+1).wrap(0, n-1)]);
+			val[i] = (rule & (1 << code)) >> code;
+		});
+		super.iterate;
+	}	
 }
 
 // cellular automaton, continuous rules

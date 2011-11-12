@@ -4,8 +4,8 @@ Remains  {
 	var ig, xg, og;
 	var in_b, freq_b, amp_b, out_b, out2_b;
 
-	var in_s, inputchannel;
-	var out1_s, out2_s, outputchannel;
+	var <>in_s, inputchannel;
+	var <>out1_s, <>out2_s, outputchannel;
 	var freq_s, amp_s;
 	
 	var vosc_bufs, delay_bufs;

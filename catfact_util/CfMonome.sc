@@ -57,23 +57,25 @@ postln(prefix);
 		// make an array of (8bit) row values and clear them
 		rowVals=Array.fill(8,0).do({arg item, i; addr.sendMsg("/box/led_row", i, 0)});
 		
-		press = { /*
+		press = { 
 			arg col, row;
 			"press ".post; [col, row].postln;
 			this.led(col, row, 1);
-			*/
+			
 		};
 		
 		lift = {
-			/*
+			
 			arg col, row;
 			"lift ".post; [col, row].postln;
 			this.led(col, row, 0);
-			*/
+			
 		};
 		
-		pressFunctions = Dictionary.new.add('default'->press);
-		liftFunctions = Dictionary.new.add('default'->lift);
+		//pressFunctions = Dictionary.new.add('default'->press);
+		//liftFunctions = Dictionary.new.add('default'->lift);
+		pressFunctions = Dictionary.new;
+		liftFunctions = Dictionary.new;
 	}
 	
 	setPrefix { arg prefixArg;
@@ -109,3 +111,56 @@ postln(prefix);
 
 }
 
+// class to represent a square of buttons as one big button
+CfQuad {
+	var <size, <>state, <>quadState, <>toggle, <>onAction, <>offAction;
+	*new {
+		arg size=4;	
+		^super.new.init(size);
+	}
+	init { arg sizeArg;
+		size = sizeArg;
+		state = Array.fill(size * size, {0});
+		quadState = 0;
+		toggle = false;
+		onAction = {};
+		offAction = {};
+	}
+	press { arg x, y;
+		if(toggle, {
+			if (state.every({|v| v==0 }), {
+				// quadState.postln;
+				quadState = 1 - quadState;
+				if (quadState == 1, {
+					// postln("on");
+					onAction.value();
+				}, {
+					// postln("off");
+					offAction.value();
+				});
+			});
+		}, {	// momentary
+			if (quadState == 0, {
+				quadState = 1;
+				postln("on");
+				onAction.value();
+			});
+		});
+		state[x*size + y] = 1;
+	}
+	
+	lift { arg x, y;
+		state[x*size + y] = 0;
+		if(toggle, {
+			// lift never toggles
+		}, {
+			if (quadState == 1, {
+				if(state.every({|v| v==0 }), {
+					quadState = 0;
+					// postln("off");
+					offAction.value();
+				});
+			});
+		});
+	}
+}

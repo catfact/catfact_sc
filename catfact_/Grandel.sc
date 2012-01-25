@@ -105,20 +105,18 @@ Grandel {
 		}.play; // init routine
 	} // init funciton
 	
-	/*
+	
 	pause {
-		gg.run(true);	
+		gg.run(false);	
 	}
 	
 	resume {
 		
 		gg.run(true);
 	}
-	*/
+	
 		
 } // Grandel class
-
-
 
 
 GrandelWrap {
@@ -229,15 +227,18 @@ GrandelWrap {
 		}.play; // init routine
 	} // init funciton
 	
-	/*
+	
 	pause {
-		gg.run(true);	
+		gg.run(false);	
 	}
 	
 	resume {
 		
 		gg.run(true);
 	}
-	*/
 		
-} // Grandel class
+} // GrandelWrap class
+
+GrandelBank {
+	
+}

@@ -32,7 +32,7 @@ CfCanvas {
 			});
 			
 			if (c == $c, {
-				window.endFullScreen.close;
+				window.endFullScreen; //.close;
 			});
 		};
 		

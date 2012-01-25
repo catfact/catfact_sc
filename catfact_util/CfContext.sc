@@ -38,6 +38,10 @@ CfAudioContext {
 					ReplaceOut.ar(bus, BHiShelf.ar(In.ar(bus), hz, rs, db));
 				}).send(s);
 				
+				SynthDef.new(\rec, { arg in=0, buf=0, loop=1, run=1, pre=0, trig=0;
+					RecordBuf.ar(In.ar(in), buf, loop:loop, run:run, preLevel:pre, trigger:trig);
+				}).send(s);
+				
 				s.sync;	
 				
 				ig = Group.new(s);

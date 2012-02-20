@@ -63,6 +63,10 @@ CfCanvas {
 	reset {
 		routine.reset; 
 	}
+	
+	next {
+		routine.next;
+	}
 }
 
 // like CfCanvas, with more specific functionality: morphs between colors and update rates

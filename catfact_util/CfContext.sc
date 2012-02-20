@@ -42,6 +42,23 @@ CfAudioContext {
 					RecordBuf.ar(In.ar(in), buf, loop:loop, run:run, preLevel:pre, trigger:trig);
 				}).send(s);
 				
+							
+			SynthDef.new(\bufdelay_fb, {
+				arg in=0, 
+					out=0,
+					buf=0,
+					amp = 1.0,
+					inputamp = 1.0,
+					delaytime= 1.0,
+					feedback = 0.0;
+				var delay, fb;
+				delay = BufDelayL.ar(buf, (In.ar(in) * inputamp) + (LocalIn.ar(1)), delaytime) * amp;
+				LocalOut.ar(delay * feedback);
+				Out.ar(out, (delay * amp));
+			
+			}).send(s);
+
+				
 				s.sync;	
 				
 				ig = Group.new(s);

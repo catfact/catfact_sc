@@ -1,5 +1,6 @@
 //// a granular synth which simply exposes all its grain parameters as control busses
 //// takes a running server and a source buffer as creation args
+//// creates some kr-rate synths as default control signals
 
 BusGrainer {
 	var <>s,
@@ -51,7 +52,6 @@ BusGrainer {
 				rate = In.kr(rate_bus); 
 				pan = In.kr(pan_bus);
 				
-				
 				amp = Lag.kr(amp, amplag);
 				
 				snd = GrainBuf.ar(
@@ -102,8 +102,11 @@ BusGrainer {
 			
 			s.sync;
 			
+			// default grain duration
 			grdur_b.set(0.5);
+			// default playback rate
 			grrate_b.set(1.0);
+			// default pan
 			grpan_b.set(0.0);
 			
 			// default grainposrate

@@ -142,7 +142,7 @@ CfQuad {
 		}, {	// momentary
 			if (quadState == 0, {
 				quadState = 1;
-				postln("on");
+//				postln("on");
 				onAction.value();
 			});
 		});

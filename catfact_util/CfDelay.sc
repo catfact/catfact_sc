@@ -5,14 +5,15 @@ CfDelay4 {
 	var <>del_s;
 		
 	*new {
-		arg server, target;
-		^super.new.init(server, target);
+		arg server, target, length;
+		^super.new.init(server, target, length);
 	}
 
 	init {
-		arg server, target;
+		arg server, target, length;
 		s = server;	
-		if(target==nil, {target = s});
+		if(target == nil, {target = s});
+		if(length == nil, { length = 30.0; });
 		
 		Routine {
 		
@@ -56,7 +57,7 @@ CfDelay4 {
 			s.sync;			
 			
 			
-			del_buf = Array.fill(4, { Buffer.alloc(s, 120.0 * s.sampleRate, 1); });
+			del_buf = Array.fill(4, { Buffer.alloc(s, length * s.sampleRate, 1); });
 			
 			0.1.wait;
 			

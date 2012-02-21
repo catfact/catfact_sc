@@ -115,6 +115,15 @@ Grandel {
 		gg.run(true);
 	}
 	
+	free {
+		gran_r.stop;
+		gg.free;
+		in_s.free;
+		phase_s.free;
+		bufwr_s.free;
+		buf.free;
+		
+	}
 		
 } // Grandel class
 

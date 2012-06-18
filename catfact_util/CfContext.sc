@@ -24,7 +24,8 @@ CfAudioContext {
 					Out.ar(out, In.ar(in) * amp);
 				}).send(s);
 					
-				SynthDef.new(\pan, {arg in=0, out=0, amp=1.0, pan=0.0;
+				SynthDef.new(\pan, {arg in=0, out=0, amp=1.0, pan=0.0, amplagup=0.0, amplagdown=0.0;
+					amp = LagUD.kr(amp, amplagup, amplagdown);
 					Out.ar(out, Pan2.ar(In.ar(in) * amp, pan));
 				}).send(s);
 				
@@ -55,6 +56,28 @@ CfAudioContext {
 					RecordBuf.ar(In.ar(in), buf, loop:loop, run:run, preLevel:pre, trigger:trig, doneAction:done);
 				}).send(s);
 				
+				SynthDef.new(\pitch, { arg in=0, outFreq=0, outHasFreq=1;
+					Out.kr([outFreq, outHasFreq], Pitch.kr(In.ar(in)));
+				}).send(s);
+				
+				SynthDef.new(\amp, { arg in=0, out=0;
+					Out.kr(out, Amplitude.kr(In.ar(in)));
+				}).send(s);						
+												
+				SynthDef.new(\centroid, { arg in=0, out=0;
+					var chain, centroid;
+					chain = FFT(LocalBuf.new(2048, 1), In.ar(in));
+					centroid = SpecCentroid.kr(chain);
+					// centroid.poll(10);
+					Out.kr(out, centroid);
+				}).send(s);
+				
+				SynthDef.new(\flatness, { arg in=0, out=0;
+					var chain, flat;
+					chain = FFT(LocalBuf.new(2048, 1), In.ar(in));
+					flat = SpecFlatness.kr(chain);
+					Out.kr(out, flat);
+				}).send(s);
 								
 				SynthDef.new(\bufdelay_fb, {
 					arg in=0, 
@@ -68,9 +91,7 @@ CfAudioContext {
 					delay = BufDelayL.ar(buf, (In.ar(in) * inputamp) + (LocalIn.ar(1)), delaytime) * amp;
 					LocalOut.ar(delay * feedback);
 					Out.ar(out, (delay * amp));
-				
 				}).send(s);
-
 				
 				s.sync;	
 				

@@ -1,7 +1,7 @@
 CfGridRaw {
-	var p; // port
-	var q; // queue
-	var r; // rx loop
+	var <>p; // serial port
+	var <>q; // rx data queue
+	var <>r; // rx read loop
 
 	// responder functions
 	var <>keyUp, <>keyDown;
@@ -15,7 +15,7 @@ CfGridRaw {
 		q = List.new;
 
 		r = Routine { var ch; inf.do {
-			ch = p.read;
+			ch = p.read; // blocks here
 			q.add(ch);
 			this.parse;
 		} }.play;
@@ -37,28 +37,78 @@ CfGridRaw {
 		});
 	}
 
+	send { arg data;
+		fork {
+			p.putAll(data);
+		};
+	}
+	
+	
+	led_set { arg x, y, val=true;
+		this.send(Int8Array.with( val.if({ 0x11 }, { 0x10 }), x, y  ));
+	}
 	
 	led_all { arg val=true;
-		fork {
-			p.put(val.if({ 0x13 }, { 0x12 }));
-		};
+		this.send( val.if({ 0x13 }, { 0x12 }) );
 	}
-
-	led_set { arg x, y, val=true;
-		fork {
-			p.putAll(Int8Array([
-				val.if({ 0x11 }, { 0x10 }), x, y
-			]));
-		};
-	}
-
 	
 	led_map { arg x, y, data = Int8Array([0, 0, 0, 0, 0, 0, 0, 0]);
-		fork {
-			p.putAll( Int8Array.with(0x14, x, y) ++ data );
-		};
+		this.send( Int8Array.with(0x14, x, y) ++ data );
+	}
+
+	led_row { arg x, y, data = 0x0;
+		this.send( Int8Array.with(0x15, x, y, data ) );
+	}
+
+	led_col { arg x, y, data = 0x0;
+		this.send( Int8Array.with(0x16, x, y, data ) );
+	}
+
+	led_intensity{ arg data = 0x0;
+		this.send( Int8Array.with(0x17, data ) );
+	}
+
+	led_level_set { arg x, y, data = 0;
+		this.send( Int8Array.with(0x18, x, y, data) );
+	}
+
+	led_level_all { arg val = 0x01;
+		this.send( Int8Array.with(0x19, val) ); 
+	}
+
+	pack_nybbles {
+		arg data;
+		var packed = Int8Array.fill(data.size / 2, {
+			arg i;
+			(data[i*2] << 4 ) | (data[i*2 + 1] & 0x0f)
+		});
+		^packed
+	}
+
+	led_level_map { arg x, y, data = Int8Array([
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0
+	]);
+		this.send( Int8Array.with(0x1A, x, y) ++ this.pack_nybbles(data) );
+	}
+
+	led_level_row { arg x, y, data = Int8Array([0, 0, 0, 0, 0, 0, 0, 0]);
+		this.send( Int8Array.with(0x1B, x, y) ++ this.pack_nybbles(data) );
 	}
 	
-	
+	led_level_col { arg x, y, data = Int8Array([0, 0, 0, 0, 0, 0, 0, 0]);
+		this.send( Int8Array.with(0x1C, x, y) ++ this.pack_nybbles(data) );
+	}
 
 }
+
+// buffer all led data and perform col updates only
+CfGridBuffer {
+}
+
